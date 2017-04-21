@@ -10,15 +10,106 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 
-import {STYLE} from './select-dropdown.component.css';
-import {TEMPLATE} from './select-dropdown.component.html';
 import {Option} from './option';
 import {OptionList} from './option-list';
 
 @Component({
     selector: 'select-dropdown',
-    template: TEMPLATE,
-    styles: [STYLE],
+    template: `
+    <div
+            [ngStyle]="{'top.px': top, 'left.px': left, 'width.px': width}">
+
+        <div class="filter"
+             *ngIf="!multiple && filterEnabled">
+            <input
+                    #filterInput
+                    autocomplete="off"
+                    [placeholder]="placeholder"
+                    (click)="onSingleFilterClick($event)"
+                    (input)="onSingleFilterInput($event)"
+                    (keydown)="onSingleFilterKeydown($event)">
+        </div>
+
+        <div class="options"
+             #optionsList>
+            <ul
+                    (wheel)="onOptionsWheel($event)">
+                <li *ngFor="let option of optionList.filtered"
+                    [ngClass]="{'highlighted': option.highlighted, 'selected': option.selected, 'disabled': option.disabled}"
+                    [ngStyle]="getOptionStyle(option)"
+                    (click)="onOptionClick(option)"
+                    (mouseover)="onOptionMouseover(option)">
+                    {{option.label}}
+                </li>
+                <li
+                        *ngIf="!optionList.hasShown"
+                        class="message">
+                    {{notFoundMsg}}
+                </li>
+            </ul>
+        </div>
+    </div>
+     `,
+    styles: [`
+select-dropdown {
+    box-sizing: border-box;
+    font-family: Sans-Serif;
+}
+select-dropdown * {
+    box-sizing: border-box;
+    font-family: Sans-Serif;
+}
+select-dropdown > div {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    box-sizing: border-box;
+    position: absolute;
+    z-index: 1;
+}
+select-dropdown > div .filter {
+    padding: 3px;
+    width: 100%;
+}
+select-dropdown > div .filter input {
+    border: 1px solid #eee;
+    box-sizing: border-box;
+    padding: 4px;
+    width: 100%;
+}
+select-dropdown > div .options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+select-dropdown > div .options ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+select-dropdown > div .options ul li {
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+}
+select-dropdown .selected {
+    background-color: #e0e0e0;
+}
+select-dropdown .selected.highlighted {
+    background-color: #2196F3;
+    color: #fff;
+}
+select-dropdown .highlighted {
+    background-color: #2196F3;
+    color: #fff;
+}
+select-dropdown .disabled {
+    background-color: #fff;
+    color: #9e9e9e;
+    cursor: default;
+    pointer-events: none;
+}
+
+    `],
     encapsulation: ViewEncapsulation.None
 })
 

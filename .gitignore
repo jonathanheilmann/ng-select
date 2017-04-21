@@ -1,10 +1,14 @@
-/dist
-/node_modules
-/docs/*.map
-
+# Node generated files
+node_modules
 npm-debug.log
-yarn-error.log
+yarn.lock
 
-*.orig
-*.swp
-*.tgz
+dist/
+aot/
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# WebStorm generated files
+.idea

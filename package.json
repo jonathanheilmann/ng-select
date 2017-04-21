@@ -1,45 +1,41 @@
 {
-  "name": "ng-select",
-  "version": "1.0.0-beta.5",
-  "description": "Select component for angular.",
-  "main": "index.js",
-  "repository": "git@github.com:basvandenberg/ng-select.git",
-  "keywords": [
-    "angular",
-    "select",
-    "select2",
-    "selectize",
-    "chosen"
-  ],
-  "author": "Bastiaan van den Berg <b.a.vandenberg@gmail.com>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/basvandenberg/ng-select/issues"
+  "name": "@heilbaum/ionic-select",
+  "version": "1.0.0-alpha.1",
+  "description": "Select component for ionic.",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "ngc": "ngc",
+    "build": "rm -rf aot dist && npm run ngc",
+    "publishPackage": "npm run build && npm publish --acces public",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://basvandenberg.github.io/ng-select",
+  "repository": "git@github.com:jonathanheilmann/heilbaum-ionic-select.git",
+  "keywords": [
+    "select",
+    "ionic"
+  ],
+  "author": "Jonathan Heilmann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jonathanheilmann/heilbaum-ionic-select/issues"
+  },
+  "homepage": "",
   "dependencies": {},
   "devDependencies": {
-    "@angular/common": "^4.0.0",
-    "@angular/compiler": "^4.0.0",
-    "@angular/compiler-cli": "^4.0.0",
-    "@angular/core": "^4.0.0",
-    "@angular/forms": "^4.0.0",
-    "@angular/platform-browser": "^4.0.0",
-    "@angular/platform-browser-dynamic": "^4.0.0",
-    "@angular/platform-server": "^4.0.0",
-    "@types/jasmine": "2.5.46",
-    "@types/node": "^7.0.12",
-    "core-js": "^2.4.1",
-    "del": "^2.2.2",
-    "fs": "^0.0.1-security",
-    "gulp": "^3.9.1",
-    "gulp-jasmine": "^2.4.2",
-    "gulp-sass": "^3.0.0",
-    "gulp-tslint": "^7.0.1",
-    "reflect-metadata": "^0.1.9",
-    "rxjs": "^5.0.2",
-    "tslint": "^4.2.0",
-    "typescript": "^2.2.0",
-    "zone.js": "^0.8.5"
+    "@angular/common": "4.0.0",
+    "@angular/compiler": "4.0.0",
+    "@angular/compiler-cli": "4.0.0",
+    "@angular/core": "4.0.0",
+    "@angular/forms": "4.0.0",
+    "@angular/http": "4.0.0",
+    "@angular/platform-browser": "4.0.0",
+    "@angular/platform-browser-dynamic": "4.0.0",
+    "@types/node": "^6.0.49",
+    "ionic-angular": "3.0.1",
+    "ionicons": "3.0.0",
+    "rxjs": "5.1.1",
+    "zone.js": "^0.8.4",
+    "typescript": "~2.2.1"
   }
 }

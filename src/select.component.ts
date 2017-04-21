@@ -1,7 +1,8 @@
-import {Component, Input, OnChanges, OnInit, Output, EventEmitter, ExistingProvider, ViewChild, ViewEncapsulation, forwardRef} from '@angular/core';
+import {
+    Component, Input, OnChanges, OnInit, Output, EventEmitter, ViewChild, ViewEncapsulation,
+    ExistingProvider, forwardRef
+} from '@angular/core';
 import {NG_VALUE_ACCESSOR, ControlValueAccessor} from '@angular/forms';
-import {STYLE} from './select.component.css';
-import {TEMPLATE} from './select.component.html';
 import {SelectDropdownComponent} from './select-dropdown.component';
 import {IOption} from './option.interface';
 import {Option} from './option';
@@ -14,16 +15,206 @@ export const SELECT_VALUE_ACCESSOR: ExistingProvider = {
 };
 
 @Component({
-    selector: 'ng-select',
-    template: TEMPLATE,
-    styles: [STYLE],
+    selector: 'hb-select',
+    template: `
+        <label
+                *ngIf="label !== ''">
+            {{label}}
+        </label>
+        <div
+                #selection
+                [attr.tabindex]="disabled ? null : 0"
+                [ngClass]="{'open': isOpen, 'focus': hasFocus, 'below': isBelow, 'disabled': disabled}"
+                (click)="onSelectContainerClick($event)"
+                (focus)="onSelectContainerFocus()"
+                (keydown)="onSelectContainerKeydown($event)"
+                (window:click)="onWindowClick()"
+                (window:resize)="onWindowResize()">
+
+            <div class="single"
+                 *ngIf="!multiple">
+                <div class="value"
+                     *ngIf="optionList.hasSelected()">
+                    {{optionList.selection[0].label}}
+                </div>
+                <div class="placeholder"
+                     *ngIf="!optionList.hasSelected()">
+                    {{placeholderView}}
+                </div>
+                <div class="clear"
+                     *ngIf="allowClear && hasSelected"
+                     (click)="onClearSelectionClick($event)">
+                    &#x2715;
+                </div>
+                <div class="toggle"
+                     *ngIf="isOpen">
+                    &#x25B2;
+                </div>
+                <div class="toggle"
+                     *ngIf="!isOpen">
+                    &#x25BC;
+                </div>
+            </div>
+
+            <div class="multiple"
+                 *ngIf="multiple">
+                <div class="option"
+                     *ngFor="let option of optionList.selection">
+            <span class="deselect-option"
+                  (click)=onDeselectOptionClick(option)>
+                &#x2715;
+            </span>
+                    {{option.label}}
+                </div>
+                <input
+                        *ngIf="filterEnabled"
+                        #filterInput
+                        autocomplete="off"
+                        tabindex="-1"
+                        [placeholder]="placeholderView"
+                        [ngStyle]="{'width.px': filterInputWidth}"
+                        (input)="onMultipleFilterInput($event)"
+                        (keydown)="onMultipleFilterKeydown($event)"/>
+            </div>
+
+        </div>
+        <select-dropdown
+                *ngIf="isOpen"
+                #dropdown
+                [multiple]="multiple"
+                [optionList]="optionList"
+                [notFoundMsg]="notFoundMsg"
+                [highlightColor]="highlightColor"
+                [highlightTextColor]="highlightTextColor"
+                [filterEnabled]="filterEnabled"
+                [placeholder]="filterPlaceholder"
+                [width]="width"
+                [top]="top"
+                [left]="left"
+                (close)="onDropdownClose($event)"
+                (optionClicked)="onDropdownOptionClicked($event)"
+                (singleFilterClick)="onSingleFilterClick()"
+                (singleFilterInput)="onSingleFilterInput($event)"
+                (singleFilterKeydown)="onSingleFilterKeydown($event)">
+        </select-dropdown>
+    `,
+    styleUrls: [`
+hb-select {
+    display: inline-block;
+    margin: 0;
+    position: relative;
+    vertical-align: middle;
+    width: 100%;
+}
+hb-select * {
+    box-sizing: border-box;
+    font-family: Sans-Serif;
+}
+hb-select > div {
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+}
+hb-select > div.disabled {
+    background-color: #eee;
+    color: #aaa;
+    cursor: default;
+    pointer-events: none;
+}
+hb-select > div > div.single {
+    display: flex;
+    height: 30px;
+    width: 100%;
+}
+hb-select > div > div.single > div.value,
+hb-select > div > div.single > div.placeholder {
+    flex: 1;
+    line-height: 30px;
+    overflow: hidden;
+    padding: 0 10px;
+    white-space: nowrap;
+}
+hb-select > div > div.single > div.placeholder {
+    color: #a9a9a9;
+}
+hb-select > div > div.single > div.clear,
+hb-select > div > div.single > div.toggle {
+    color: #aaa;
+    line-height: 30px;
+    text-align: center;
+    width: 30px;
+}
+hb-select > div > div.single > div.clear:hover,
+hb-select > div > div.single > div.toggle:hover {
+    background-color: #ececec;
+}
+hb-select > div > div.single > div.clear {
+    font-size: 18px;
+}
+hb-select > div > div.single > div.toggle {
+    font-size: 14px;
+}
+hb-select > div > div.multiple {
+    display: flex;
+    flex-flow: row wrap;
+    height: 100%;
+    min-height: 30px;
+    padding: 0 10px;
+    width: 100%;
+}
+hb-select > div > div.multiple > div.option {
+    background-color: #eee;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    color: #333;
+    cursor: default;
+    display: inline-block;
+    flex-shrink: 0;
+    font-size: 14px;
+    line-height: 22px;
+    margin: 3px 5px 3px 0;
+    padding: 0 4px;
+}
+hb-select > div > div.multiple > div.option span.deselect-option {
+    color: #aaa;
+    cursor: pointer;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+}
+hb-select > div > div.multiple > div.option span.deselect-option:hover {
+    color: #555;
+}
+hb-select > div > div.multiple input {
+    background-color: transparent;
+    border: none;
+    height: 30px;
+    line-height: 30px;
+    padding: 0;
+}
+hb-select > div > div.multiple input:focus {
+    outline: none;
+}
+hb-select label {
+    color: rgba(0, 0, 0, 0.38);
+    display: block;
+    font-size: 13px;
+    padding: 4px 0;
+}   
+    `],
     providers: [SELECT_VALUE_ACCESSOR],
     encapsulation: ViewEncapsulation.None
 })
-
 export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit {
 
-    @Input() options: Array<IOption>;
+    @Input() mapOptions: {
+        'value': string,
+        'label': string
+    };
+
+    @Input() options: Array<any>;
 
     @Input() allowClear: boolean = false;
     @Input() disabled: boolean = false;
@@ -268,7 +459,20 @@ export class SelectComponent implements ControlValueAccessor, OnChanges, OnInit 
             v = this.optionList.value;
         }
 
-        this.optionList = new OptionList(this.options);
+        console.log(this.mapOptions);
+        let mappedOptions: Array<IOption> = [];
+        if (this.mapOptions) {
+            for (let i = 0, len = this.options.length; i < len; i++) {
+                mappedOptions.push({
+                    'value': this.options[i][this.mapOptions.value],
+                    'label': this.options[i][this.mapOptions.label]
+                })
+            }
+        } else {
+            mappedOptions = Object.assign({}, this.options);
+        }
+        console.log(mappedOptions);
+        this.optionList = new OptionList(mappedOptions);
 
         if (!firstTime) {
             this.optionList.value = v;
